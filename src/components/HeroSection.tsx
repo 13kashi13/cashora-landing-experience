@@ -1,113 +1,161 @@
-import { motion } from "framer-motion";
-import heroBg from "@/assets/hero-bg.jpg";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import { ArrowRight, Play } from "lucide-react";
 
 const HeroSection = () => {
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background image */}
-      <div className="absolute inset-0">
-        <img
-          src={heroBg}
-          alt=""
-          className="w-full h-full object-cover opacity-60"
-        />
-        <div className="absolute inset-0 bg-background/40" />
-      </div>
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
 
-      {/* Animated gradient orbs */}
+  const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.92]);
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+    >
+      {/* Animated grid lines */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full animate-pulse-glow animate-float"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
-            background:
-              "radial-gradient(circle, hsl(270 80% 65% / 0.15) 0%, transparent 70%)",
-          }}
-        />
-        <div
-          className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full animate-pulse-glow"
-          style={{
-            background:
-              "radial-gradient(circle, hsl(280 70% 55% / 0.12) 0%, transparent 70%)",
-            animationDelay: "1.5s",
-          }}
-        />
-        <div
-          className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full animate-float"
-          style={{
-            background:
-              "radial-gradient(circle, hsl(270 90% 75% / 0.08) 0%, transparent 70%)",
-            animationDelay: "3s",
+            backgroundImage: `
+              linear-gradient(hsl(270 80% 65% / 0.3) 1px, transparent 1px),
+              linear-gradient(90deg, hsl(270 80% 65% / 0.3) 1px, transparent 1px)
+            `,
+            backgroundSize: "80px 80px",
           }}
         />
       </div>
 
+      {/* Radiating rings */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        {[1, 2, 3].map((ring) => (
+          <motion.div
+            key={ring}
+            className="absolute rounded-full border border-primary/5"
+            style={{
+              width: `${ring * 350}px`,
+              height: `${ring * 350}px`,
+            }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, delay: 0.3 * ring, ease: "easeOut" }}
+          />
+        ))}
+      </div>
+
+      {/* Floating shapes */}
+      <motion.div
+        className="absolute top-20 left-[15%] w-3 h-3 rounded-full bg-primary/20"
+        animate={{ y: [0, -30, 0], x: [0, 15, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute top-[30%] right-[10%] w-2 h-2 rounded-full bg-accent/20"
+        animate={{ y: [0, 20, 0], x: [0, -10, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      />
+      <motion.div
+        className="absolute bottom-[25%] left-[8%] w-4 h-4 rounded-sm bg-primary/10 rotate-45"
+        animate={{ y: [0, -20, 0], rotate: [45, 90, 45] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      />
+      <motion.div
+        className="absolute top-[60%] right-[20%] w-6 h-px bg-primary/20"
+        animate={{ scaleX: [1, 2, 1], opacity: [0.2, 0.5, 0.2] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
+
       {/* Content */}
-      <div className="relative z-10 container-tight text-center">
+      <motion.div
+        className="relative z-10 container-wide text-center"
+        style={{ y, opacity, scale }}
+      >
+        {/* Status badge */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-8"
         >
-          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 gradient-text glow-text">
-            Cashora
-          </h1>
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs font-medium tracking-widest uppercase text-muted-foreground">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            AI-Powered Automation
+          </span>
         </motion.div>
 
+        {/* Main headline */}
+        <motion.h1
+          className="font-display text-7xl sm:text-8xl md:text-9xl lg:text-[11rem] font-bold tracking-tighter mb-6 gradient-text glow-text leading-[0.9]"
+          initial={{ opacity: 0, y: 60, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        >
+          CASHORA
+        </motion.h1>
+
         <motion.p
-          className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto mb-4"
+          className="text-lg sm:text-xl md:text-2xl text-foreground/80 font-display font-medium max-w-2xl mx-auto mb-4"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
           AI-powered content automation for passive income
         </motion.p>
 
         <motion.p
-          className="text-sm sm:text-base text-muted-foreground/70 max-w-lg mx-auto mb-10"
+          className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
-          Turn a single prompt into videos and publish them everywhere with one
-          click.
+          Turn a single prompt into AI-generated videos and distribute them
+          across multiple platforms with one click.
         </motion.p>
 
+        {/* CTA Buttons */}
         <motion.div
+          className="flex flex-col sm:flex-row items-center justify-center gap-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <button className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-full glass gradient-border glow-primary transition-all duration-500 hover:scale-105 hover:glow-accent">
-            <span className="gradient-text font-semibold text-base">
-              Join Early Access
-            </span>
-            <svg
-              className="w-4 h-4 text-primary transition-transform duration-300 group-hover:translate-x-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
-          </button>
+          <motion.a
+            href="#how-it-works"
+            className="btn-primary px-8 py-4 text-primary-foreground text-base cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <Play className="w-4 h-4" />
+            See How It Works
+          </motion.a>
+          <motion.a
+            href="#status"
+            className="btn-secondary px-8 py-4 text-foreground/90 text-base cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Coming Soon
+            <ArrowRight className="w-4 h-4" />
+          </motion.a>
         </motion.div>
-      </div>
+      </motion.div>
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
+        transition={{ delay: 2, duration: 1 }}
       >
-        <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex justify-center pt-2">
+        <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/20 flex justify-center pt-2">
           <motion.div
-            className="w-1 h-2 rounded-full bg-primary"
+            className="w-1 h-2 rounded-full bg-primary/70"
             animate={{ y: [0, 12, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
